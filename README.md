@@ -1,16 +1,13 @@
-# todo_project
+# Todo Application
 
-A new Flutter project.
+This Flutter application allows users to create, modify and delete their tasks.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+- Download Android Studio
+- Download Flutter SDK
+- Open Android Studio and follow the steps to create the first Flutter project
+- Run "flutter doctor" to check if all the softwares are compatible and there is nothing to miss
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+# Install required packages by the following commands
+- flutter pub add flutter_slidable
