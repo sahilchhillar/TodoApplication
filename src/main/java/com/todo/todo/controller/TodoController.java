@@ -35,10 +35,16 @@ public class TodoController {
         }
     }
 
-    @GetMapping(value = "tasks")
-    public List<Todo> getAllTasks() throws Exception{
+    @GetMapping(value = "tasks/pending")
+    public List<Todo> getAllPendingTasks() throws Exception{
         System.out.println("Retrieving all the data!!!");
-        return todoServiceImpl.getTasks();
+        return todoServiceImpl.getPendingTasks();
+    }
+
+    @GetMapping(value = "tasks/completed")
+    public List<Todo> getAllCompletedTasks() throws Exception{
+        System.out.println("Retrieving all the data!!!");
+        return todoServiceImpl.getCompletedTasks();
     }
 
     @PutMapping(value = "task/{id}", headers = {"content-type=application/json"})

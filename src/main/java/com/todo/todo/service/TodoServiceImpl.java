@@ -1,8 +1,9 @@
 package com.todo.todo.service;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDate;
+import java.time.ZoneId;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ public class TodoServiceImpl implements TodoService {
     @Override
     public ResponseEntity<HttpStatus> saveTask(TodoPojo todoPojo) throws Exception {
         try {
-            Todo todo = new Todo(todoPojo.getTask(), todoPojo.isPending(), new Date());
+            Todo todo = new Todo(todoPojo.getTask(), todoPojo.isPending(), LocalDate.now(ZoneId.systemDefault()), LocalDate.now(ZoneId.systemDefault()));
             todoRepository.save(todo);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (Exception e) {
@@ -31,9 +32,21 @@ public class TodoServiceImpl implements TodoService {
     }
 
     @Override
-    public List<Todo> getTasks() throws Exception {
+    public List<Todo> getPendingTasks() throws Exception {
         try {
-            List<Todo> tasks = todoRepository.findAll();
+            List<Todo> tasks = todoRepository.findByPending(true);
+            System.out.println(tasks.size());
+            return tasks;
+        } catch (Exception e) {
+            System.out.println("Exception thrown: " + e.getMessage());
+            throw new Exception(e);
+        }
+    }
+
+    @Override
+    public List<Todo> getCompletedTasks() throws Exception {
+        try {
+            List<Todo> tasks = todoRepository.findByPending(false);
             return tasks;
         } catch (Exception e) {
             System.out.println("Exception thrown: " + e.getMessage());
@@ -67,6 +80,7 @@ public class TodoServiceImpl implements TodoService {
                 Optional<Todo> todo = todoRepository.findById(id);
                 Todo task = todo.get();
                 task.setPending(false);
+                task.setCompletedOn(LocalDate.now(ZoneId.systemDefault()));
                 todoRepository.save(task);
                 return new ResponseEntity<HttpStatus>(HttpStatus.OK);
             }

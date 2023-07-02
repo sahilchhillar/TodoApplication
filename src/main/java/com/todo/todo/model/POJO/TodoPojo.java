@@ -1,12 +1,13 @@
 package com.todo.todo.model.POJO;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 public class TodoPojo {
     private String ID;
     private String task;
     private boolean pending;
-    private Date createdOn;
+    private LocalDate createdOn;
+    private LocalDate completedOn;
 
     /**
      * @return String return the ID
@@ -37,16 +38,16 @@ public class TodoPojo {
     }
 
     /**
-     * @return Date return the createdOn
+     * @return LocalDate return the createdOn
      */
-    public Date getCreatedOn() {
+    public LocalDate getCreatedOn() {
         return createdOn;
     }
 
     /**
      * @param createdOn the createdOn to set
      */
-    public void setCreatedOn(Date createdOn) {
+    public void setCreatedOn(LocalDate createdOn) {
         this.createdOn = createdOn;
     }
 
@@ -63,6 +64,20 @@ public class TodoPojo {
      */
     public void setPending(boolean pending) {
         this.pending = pending;
+    }
+
+    /**
+     * @return LocalDate return the completedOn
+     */
+    public LocalDate getCompletedOn() {
+        return completedOn;
+    }
+
+    /**
+     * @param completedOn the completedOn to set
+     */
+    public void setCompletedOn(LocalDate completedOn) {
+        this.completedOn = completedOn;
     }
 
 }
