@@ -30,14 +30,17 @@ class TodoApp extends StatefulWidget {
 }
 
 class _TodoApp extends State<TodoApp> {
-  late Future<List> todoData;
+  late Future<List> pendingTasks;
+  late Future<List> completedTasks;
+  final String pending = "Pending Tasks";
+  final String completed = "Completed Tasks";
 
   @override
   void initState() {
     super.initState();
-    // print('Inside init function');
     setState(() {
-      todoData = GetData().getTasks();
+      pendingTasks = GetData().getPendingTasks();
+      completedTasks = GetData().getCompletedTasks();
     });
   }
 
@@ -55,7 +58,7 @@ class _TodoApp extends State<TodoApp> {
             height: 70,
             width: 70,
             child: FloatingActionButton(
-              onPressed: () => _createPopupCard(' ', false, ''),
+              onPressed: () => _createPopupCard('', false, ''),
               backgroundColor: Colors.red,
               highlightElevation: 10,
               elevation: 10,
@@ -68,81 +71,39 @@ class _TodoApp extends State<TodoApp> {
         ),
         backgroundColor: Colors.white,
         body: Padding(
-            padding:
-                const EdgeInsets.only(top: 30, left: 20, right: 20, bottom: 30),
-            child: FutureBuilder<List>(
-              future: todoData,
-              builder: (context, snapshot) {
-                // print(snapshot);
-                if (snapshot.hasData) {
-                  return ListView.builder(
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (context, index) {
-                      return Slidable(
-                        startActionPane: ActionPane(
-                          motion: const ScrollMotion(),
-                          children: [
-                            SlidableAction(
-                              onPressed: (context) => {
-                                PutData().updatePending(
-                                    snapshot.data![index].id.toString())
-                              },
-                              flex: 2,
-                              backgroundColor: Colors.green,
-                              icon: Icons.check,
-                              label: 'Completed',
-                            )
-                          ],
-                        ),
-                        endActionPane: ActionPane(
-                          motion: const ScrollMotion(),
-                          children: [
-                            SlidableAction(
-                              flex: 2,
-                              onPressed: (context) => {
-                                DeleteData().deleteAlbum(
-                                    snapshot.data![index].id.toString()),
-                                setState(() {
-                                  todoData = GetData().getTasks();
-                                })
-                              },
-                              backgroundColor: Colors.red,
-                              icon: Icons.delete,
-                              label: 'Delete',
-                            ),
-                            SlidableAction(
-                              flex: 2,
-                              onPressed: (context) => {
-                                // print(snapshot.data![index].task.toString()),
-                                _createPopupCard(
-                                    snapshot.data![index].task.toString(),
-                                    true,
-                                    snapshot.data![index].id.toString()),
-                              },
-                              backgroundColor: Colors.green,
-                              icon: Icons.edit,
-                              label: 'Edit',
-                            ),
-                          ],
-                        ),
-                        child: ListTile(
-                          title: Text(snapshot.data![index].task.toString()),
-                          trailing: Text(snapshot.data![index].pending
-                              ? "Pending"
-                              : "Completed"),
-                          subtitle:
-                              Text(snapshot.data![index].createdOn.toString()),
-                        ),
-                      );
-                    },
-                  );
-                } else if (snapshot.hasError) {
-                  // print("Hello World");
-                  return Text('${snapshot.error}');
-                }
-                return const Center(child: CircularProgressIndicator());
-              },
-            )));
+          padding: const EdgeInsets.only(bottom: 20),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: Text(
+                    pending,
+                    style: const TextStyle(
+                      fontSize: 20,
+                    ),
+                  ),
+                ),
+              ),
+              pendingTasksMethod(),
+              Padding(
+                padding: const EdgeInsets.only(top: 15),
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: Text(
+                    completed,
+                    style: const TextStyle(
+                      fontSize: 20,
+                    ),
+                  ),
+                ),
+              ),
+              completedTasksMethod()
+            ],
+          ),
+        ));
   }
 
   Future<void> _createPopupCard(
@@ -157,7 +118,7 @@ class _TodoApp extends State<TodoApp> {
         PutData().updateTask(taskController.text, id);
       }
       setState(() {
-        todoData = GetData().getTasks();
+        pendingTasks = GetData().getPendingTasks();
       });
     }
 
@@ -229,5 +190,126 @@ class _TodoApp extends State<TodoApp> {
             ),
           );
         });
+  }
+
+  SizedBox pendingTasksMethod() {
+    return SizedBox(
+      height: MediaQuery.of(context).size.height / 3,
+      child: Padding(
+          padding: const EdgeInsets.only(top: 10, left: 20, right: 20),
+          child: FutureBuilder<List>(
+            future: pendingTasks,
+            builder: (context, snapshot) {
+              // print(snapshot);
+              if (snapshot.hasData) {
+                return ListView.builder(
+                  itemCount: snapshot.data!.length,
+                  // ignore: body_might_complete_normally_nullable
+                  itemBuilder: (context, index) {
+                    return Slidable(
+                      startActionPane: ActionPane(
+                        motion: const ScrollMotion(),
+                        children: [
+                          SlidableAction(
+                            onPressed: (context) => {
+                              PutData().updatePending(
+                                  snapshot.data![index].id.toString()),
+
+                              setState(() {
+                                pendingTasks = GetData().getPendingTasks();
+                              })
+                            },
+                            flex: 2,
+                            backgroundColor: Colors.green,
+                            icon: Icons.check,
+                            label: 'Completed',
+                          )
+                        ],
+                      ),
+                      endActionPane: ActionPane(
+                        motion: const ScrollMotion(),
+                        children: [
+                          SlidableAction(
+                            flex: 2,
+                            onPressed: (context) => {
+                              DeleteData().deleteAlbum(
+                                  snapshot.data![index].id),
+                              setState(() {
+                                pendingTasks = GetData().getPendingTasks();
+                              })
+                            },
+                            backgroundColor: Colors.red,
+                            icon: Icons.delete,
+                            label: 'Delete',
+                          ),
+                          SlidableAction(
+                            flex: 2,
+                            onPressed: (context) => {
+                              // print(snapshot.data![index].task.toString()),
+                              _createPopupCard(
+                                  snapshot.data![index].task.toString(),
+                                  true,
+                                  snapshot.data![index].id.toString()),
+                            },
+                            backgroundColor: Colors.green,
+                            icon: Icons.edit,
+                            label: 'Edit',
+                          ),
+                        ],
+                      ),
+                      child: ListTile(
+                        title: Text(snapshot.data![index].task.toString()),
+                        trailing: Text(snapshot.data![index].pending
+                            ? "Pending"
+                            : "Completed"),
+                        subtitle:
+                            Text(snapshot.data![index].createdOn.toString()),
+                      ),
+                    );
+                  },
+                );
+              } else if (snapshot.hasError) {
+                // print("Hello World");
+                return Text('${snapshot.error}');
+              }
+              return const Center(child: CircularProgressIndicator());
+            },
+          )),
+    );
+  }
+
+  SizedBox completedTasksMethod() {
+    return SizedBox(
+      height: MediaQuery.of(context).size.height / 3,
+      child: Padding(
+          padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
+          child: FutureBuilder<List>(
+            future: completedTasks,
+            builder: (context, snapshot) {
+              // print(snapshot);
+              if (snapshot.hasData) {
+                return ListView.builder(
+                  itemCount: snapshot.data!.length,
+                  // ignore: body_might_complete_normally_nullable
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                      title: Text(snapshot.data![index].task.toString()),
+                      trailing: Text(snapshot.data![index].pending
+                          ? "Pending"
+                          : "Completed"),
+                      subtitle:
+                          Text(snapshot.data![index].completedOn.toString()),
+                      enabled: false
+                    );
+                  },
+                );
+              } else if (snapshot.hasError) {
+                // print("Hello World");
+                return Text('${snapshot.error}');
+              }
+              return const Center(child: CircularProgressIndicator());
+            },
+          )),
+    );
   }
 }
